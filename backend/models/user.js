@@ -1,33 +1,56 @@
-// app/models/user.js
-// load the things we need
 var mongoose = require('mongoose');
 var bcrypt   = require('bcrypt-nodejs');
 
-// define the schema for our user model
-var userSchema = mongoose.Schema({
-    local            : {
-        email        : String,
-        password     : String,
-    },
-    facebook         : {
-        id           : String,
-        token        : String,
-        email        : String,
-        name         : String
-    },
-    twitter          : {
-        id           : String,
-        token        : String,
-        displayName  : String,
-        username     : String
-    },
-    google           : {
-        id           : String,
-        token        : String,
-        email        : String,
-        name         : String
+var userSchema = new mongoose.Schema({
+  profile: {
+    admin: {
+      type: Boolean
+      // ,required: true
     }
-
+    ,username: {
+      type: String
+      ,required: true
+      ,lowercase: true
+      ,unique: true
+    }
+    ,firstname: {
+      type: String
+      // ,required: true
+    }
+    ,lastname: {
+      type: String
+      // ,required: true
+    }
+    ,password: {
+      type: String
+      ,required: true
+    }
+    ,mail:{
+      type: String
+    }
+    ,created: {
+      type: Date
+      ,default: Date.now
+    }
+    ,updated: {
+      type: Date
+      ,default: Date.now
+    }
+  },
+  data: {
+    oauth: {
+      type: String
+    }
+    ,apperance: {
+      menuColor: String
+      ,mainColor: String
+    }
+    ,csvConfig: {
+      type: String
+      // ,required: true
+      ,match: /^http:\/\//i
+    }
+  }
 });
 
 // methods ======================
@@ -38,7 +61,7 @@ userSchema.methods.generateHash = function(password) {
 
 // checking if password is valid
 userSchema.methods.validPassword = function(password) {
-    return bcrypt.compareSync(password, this.local.password);
+    return bcrypt.compareSync(password, this.profile.password);
 };
 
 // create the model for users and expose it to our app

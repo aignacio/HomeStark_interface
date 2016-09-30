@@ -34,27 +34,25 @@ module.exports = function(passport) {
     // by default, if there was no name, it would just be called 'local'
 
     passport.use('local-signup', new LocalStrategy({
-        // by default, local strategy uses username and password, we will override with email
-        usernameField : 'email',
+        usernameField : 'username',
         passwordField : 'password',
         passReqToCallback : true // allows us to pass back the entire request to the callback
     },
-    function(req, email, password, done) {
-
+    function(req, username, password, done) {
         // asynchronous
         // User.findOne wont fire unless data is sent back
         process.nextTick(function() {
 
         // find a user whose email is the same as the forms email
         // we are checking to see if the user trying to login already exists
-        User.findOne({ 'local.email' :  email }, function(err, user) {
+        User.findOne({ 'profile.username' : username }, function(err, user) {
             // if there are any errors, return the error
             if (err)
                 return done(err);
 
             // check to see if theres already a user with that email
             if (user) {
-                return done(null, false, req.flash('signupMessage', 'That email is already taken.'));
+                return done(null, false, req.flash('signupMessage', 'Este nome de usuário já existe'));
             } else {
 
                 // if there is no user with that email
@@ -62,9 +60,12 @@ module.exports = function(passport) {
                 var newUser            = new User();
 
                 // set the user's local credentials
-                newUser.local.email    = email;
-                newUser.local.password = newUser.generateHash(password);
-
+                newUser.profile.username    = username;
+                newUser.profile.password    = newUser.generateHash(password);
+                newUser.profile.firstname   = req.param('firstname');
+                newUser.profile.lastname    = req.param('lastname');
+                newUser.profile.mail        = req.param('email');
+                newUser.profile.admin       = req.param('admin');
                 // save the user
                 newUser.save(function(err) {
                     if (err)
@@ -79,4 +80,38 @@ module.exports = function(passport) {
 
     }));
 
+    // =========================================================================
+    // LOCAL LOGIN =============================================================
+    // =========================================================================
+    // we are using named strategies since we have one for login and one for signup
+    // by default, if there was no name, it would just be called 'local'
+
+    passport.use('local-login', new LocalStrategy({
+        // by default, local strategy uses username and password, we will override with email
+        usernameField : 'username',
+        passwordField : 'password',
+        passReqToCallback : true // allows us to pass back the entire request to the callback
+    },
+    function(req, username, password, done) { // callback with email and password from our form
+
+        // find a user whose email is the same as the forms email
+        // we are checking to see if the user trying to login already exists
+        User.findOne({"$or": [{ 'profile.username' :  username},
+                             {'profile.mail' :  username  }]}, function(err, user) {
+            // if there are any errors, return the error before anything else
+            if (err)
+                return done(err);
+
+            // if no user is found, return the message
+            if (!user)
+                return done(null, false, req.flash('loginMessage', 'Usuário não encontrado!')); // req.flash is the way to set flashdata using connect-flash
+
+            // if the user is found but the password is wrong
+            if (!user.validPassword(password))
+                return done(null, false, req.flash('loginMessage', 'Senha errada!')); // create the loginMessage and save it to session as flashdata
+
+            // all is well, return successful user
+            return done(null, user);
+        });
+    }));
 };
