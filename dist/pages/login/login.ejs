@@ -1,1 +1,12 @@
-<!doctype html><html><head><title>HomeStark Login</title><link rel=stylesheet type=text/css href=lib/css/components.min.css><link rel=icon type=image/png href=/img/favicon.png><script type=text/javascript src=lib/js/components.min.js></script></head><body><div class=container><div class="col-sm-6 col-sm-offset-3"><h1><span class="fa fa-sign-in"></span> Login</h1><% if (message.length>0) { %><div class="alert alert-danger"><%= message %></%=></div><% } %><form action=/login method=post><div class=form-group><label>Email</label> <input type=text class=form-control name=username></div><div class=form-group><label>Password</label> <input type=password class=form-control name=password></div><button type=submit class="btn btn-warning btn-lg">Login</button></form><hr><p>Need an account? <a href=/signup>Signup</a></p><p>Or go <a href="/">home</a>.</p></%></%></div></div></body></html>
+<!doctype html><html lang=en ng-app=superhero><head><title>HomeStark Login</title><link rel=stylesheet type=text/css href=lib/css/components.min.css><link rel=icon type=image/png href=/img/favicon.jpg><script type=text/javascript src=lib/js/components.min.js></script><script type=text/javascript src=js/homestark.min.js></script><style>
+      .vertical-center {
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        margin: auto;
+        font-size: large;
+        font-weight: bold;
+      }
+    </style></head><body><div class=container><p align=right><a href=/signup style=color:black;>Sem cadastro?</a></p><div class="vertical-center text-center" style=margin-top:20%; ng-controller=loginCtrl><div class=row style="margin:0 auto; width: 30%;"><img width=64 src=img/logo_symbol.png alt="Logotipo Oficial"><br><span style=margin-top:5%;>HomeStark</span></div><div class=row style="margin:0 auto; width: 15%"><% if (message.length>0) { %><div class="alert alert-danger" style="font-size: initial;"><%= message %></%=></div><% } %><form action=/login method=post><div style=margin-top:3%; class="ui icon input"><input type=text class=form-control name=username placeholder=username> <i class="black user icon"></i></div><div style=margin-top:3%; class="ui icon input"><input type=password class=form-control name=password placeholder=senha> <i class="black privacy icon"></i></div><button type=submit style=margin-top:5%; ng-class=class ng-click=loadLogin() ng-init="login = false" class="ui secondary button">Entrar</button></form></%></%></div></div></div></body></html>

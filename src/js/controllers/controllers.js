@@ -1,4 +1,7 @@
 var homeStarkController = angular.module('homeStarkControllers', []);
 
-homeStarkController.controller('devicesCtrl',['$scope',function ($scope) {
+homeStarkController.controller('loginCtrl',['$scope',function ($scope) {
+  $scope.loadLogin = function(){
+    $scope.class = "loading";
+  };
 }]);

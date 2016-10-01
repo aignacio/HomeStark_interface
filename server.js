@@ -21,7 +21,7 @@ app.use(bodyParser.json({limit: '50mb'}));
 app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 
 // configuration ===============================================================
-var DEBUG_MONGO = 1;
+var DEBUG_MONGO = 0;
 mongoCon(DEBUG_MONGO);
 
 require('./config/passport')(passport); // pass passport for configuration

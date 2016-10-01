@@ -30,10 +30,17 @@ var paths = {
     scripts: 'src/js/**/*.*',
     styles: 'src/css/**/*.*',
     images: 'src/img/**/*.*',
+    fonts: 'src/fonts/**/*.*',
     pages: 'src/html/**/*.ejs',
     index: 'src/index.ejs',
-    bower_fonts: 'src/components/**/*.{ttf,woff,eof,svg,woff2,eot}'
+    bower_fonts: 'src/components/**/*.{ttf,woff,eof,svg,woff2,eot}',
+    semantic_fonts: 'src/components/semantic/dist/themes/basic/assets/fonts/*.{ttf,woff,eof,svg,woff2,eot}'
 };
+
+gulp.task('copy-fonts', function() {
+    return gulp.src(paths.semantic_fonts)
+      .pipe(gulp.dest('dist/lib/css/themes/default/assets/fonts'));
+});
 
 gulp.task('copy-images', function() {
     return gulp.src(paths.images)
@@ -94,7 +101,7 @@ gulp.task('usemin', function() {
 });
 
 gulp.task('copy-data', ['copy-bower_fonts','copy-images']);
-gulp.task('build', ['copy-data','min_css','min_html','lint','min_js','usemin']);
+gulp.task('build', ['copy-data','min_css','min_html','lint','min_js','usemin','copy-fonts']);
 
 gulp.task('watch', function() {
     gulp.watch([paths.images], ['copy-images']);
