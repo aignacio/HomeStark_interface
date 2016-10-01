@@ -10,7 +10,7 @@
     "6LoWPAN"
   ],
   "dependencies": {
-    "angular-ui-switch":"latest",
+    "angular-ui-switch": "latest",
     "spinkit": "latest",
     "angular-bootstrap-grid-tree": "latest",
     "angular-tree-dnd": "latest",
@@ -30,6 +30,7 @@
     "angular-google-maps": "~2.2.0",
     "angular-location-update": "latest",
     "bootstrap": "~3.2.0",
+    "angular-video-bg": "~0.2",
     "font-awesome": "~4.5.0",
     "angular-knob": "latest",
     "parsleyjs": "latest",
@@ -45,5 +46,8 @@
     "ng-knob": "~0.1.1"
   },
   "license": "MIT",
-  "homepage": ""
+  "homepage": "",
+  "resolutions": {
+    "angular": "~1.4.7"
+  }
 }

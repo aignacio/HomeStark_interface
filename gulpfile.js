@@ -31,11 +31,16 @@ var paths = {
     styles: 'src/css/**/*.*',
     images: 'src/img/**/*.*',
     fonts: 'src/fonts/**/*.*',
+    video: 'src/video/**/*.*',
     pages: 'src/html/**/*.ejs',
     index: 'src/index.ejs',
     bower_fonts: 'src/components/**/*.{ttf,woff,eof,svg,woff2,eot}',
     semantic_fonts: 'src/components/semantic/dist/themes/basic/assets/fonts/*.{ttf,woff,eof,svg,woff2,eot}'
 };
+gulp.task('copy-video', function() {
+    return gulp.src(paths.video)
+      .pipe(gulp.dest('dist/video'));
+});
 
 gulp.task('copy-fonts', function() {
     return gulp.src(paths.semantic_fonts)
@@ -101,7 +106,7 @@ gulp.task('usemin', function() {
 });
 
 gulp.task('copy-data', ['copy-bower_fonts','copy-images']);
-gulp.task('build', ['copy-data','min_css','min_html','lint','min_js','usemin','copy-fonts']);
+gulp.task('build', ['copy-data','min_css','min_html','lint','min_js','usemin','copy-fonts','copy-video']);
 
 gulp.task('watch', function() {
     gulp.watch([paths.images], ['copy-images']);
