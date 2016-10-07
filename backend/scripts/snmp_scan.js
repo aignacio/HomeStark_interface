@@ -6,6 +6,8 @@ var util = require('util');
 var colors = require('colors');
 var constants = require('../var_constants');
 var emoji = require('node-emoji');
+var node = require('../models/nodes');
+var mongoCon = require('../../config/database.js');
 
 var debug_snmp = false,
     nms_add = 'aaaa::1';
@@ -44,6 +46,8 @@ Array.prototype.hasNode = function(element) {
 };
 
 trapd.on('trap', function(msg){
+  var data = snmp.message.serializer(msg)['pdu'];
+  var hw_trap = data.varbinds[0].string_value;
   var address_node = msg._src.address,
       exists = devices_list.hasNode(address_node);
   if (debug_snmp)
@@ -68,9 +72,11 @@ trapd.on('trap', function(msg){
       link_metric:'---',
       global_ipv6:'---',
       local_ipv6:'---',
-      hw_address:'---'
+      hw_address: hw_trap,
+      update: new Date().toISOString()
     };
     devices_list.push(node);
+    dataSaveDB(node)
   }
 });
 
@@ -122,11 +128,36 @@ function processSNMP(oid, value){
       break;
     }
   }
+  // devices_list[i].update = new Date().toISOString();
+  devices_list[i].update = Date.now();
   if (debug_snmp){
     console.log('[GET-RESPONSE]'.black.bgWhite+' ['+oid.magenta+'] '+emoji.get(':arrow_right:')+' ['+devices_list[i].address_ipv6.white+'] '+emoji.get(':arrow_right:')+' ['+value+']');
     console.log('[GET-RESPONSE]'.black.bgWhite+' ['+oid.magenta+'] '+emoji.get(':arrow_right:')+' ['+nms_add.white+'] '+emoji.get(':arrow_left:')+emoji.get(':arrow_left:')+emoji.get(':arrow_left:')+' ['+devices_list[i].address_ipv6.white+']');
   }
 
+  devices_list[i].active = true;
+  devices_list[i].poll = true;
+  // Saving data to MongoDB
+  if (devices_list[i].hw_address != '---')
+    dataUpdateDB(devices_list[i]);
+}
+
+function utcformat(d){
+    d= new Date(d);
+    var tail= 'GMT', D= [d.getUTCFullYear(), d.getUTCMonth()+1, d.getUTCDate()],
+    T= [d.getUTCHours()-3, d.getUTCMinutes(), d.getUTCSeconds()];
+    if(+T[0]> 12){
+        T[0]-= 12;
+        tail= ' pm '+tail;
+    }
+    else tail= ' am '+tail;
+    var i= 3;
+    while(i){
+        --i;
+        if(D[i]<10) D[i]= '0'+D[i];
+        if(T[i]<10) T[i]= '0'+T[i];
+    }
+    return D.join('/')+' '+T.join(':')+ tail;
 }
 
 function listDevices(special_feature){
@@ -151,6 +182,8 @@ function listDevices(special_feature){
             link_metric = devices_list[index].link_metric,
             global_ipv6 = devices_list[index].global_ipv6,
             local_ipv6  = devices_list[index].local_ipv6,
+            update      = devices_list[index].update,
+            hardware    = devices_list[index].hw_address,
             total       = devices_list.length,
             total_ativo = total_act_devices;
         if (dev_stat == true){
@@ -161,6 +194,7 @@ function listDevices(special_feature){
           dev_stat = 'inativo';
           console.log(emoji.get(':arrow_right:')+' Dispositivo IPv6: ['+addr.red+']');
         }
+        update = utcformat(update);
         poll = String(poll);
         console.log('Status      :['+dev_stat.white+']');
         console.log('Poll        :['+poll.white+']');
@@ -171,6 +205,8 @@ function listDevices(special_feature){
         console.log('Link métrica:['+link_metric.white+']');
         console.log('IPv6 Global :['+global_ipv6.white+']');
         console.log('IPv6 Local  :['+local_ipv6.white+']');
+        console.log('Hardware    :['+hardware.white+']');
+        console.log('Atualização :['+update.white+']');
       }
     }
   }
@@ -249,6 +285,70 @@ function verifAliveDevices(){
       else
         devices_list[index].poll = false; //Refresh the status to new scan ~50 seconds
   listDevices();
+}
+
+function dataUpdateDB(device){
+  node.findOne({'hw_address':device.hw_address.toLowerCase()}, function(err,node_data){
+    if (err) {
+      console.log('[Erro] ao procurar nó no banco de dados: '+err);
+      throw err;
+    }
+    if (node_data) {
+      node.update({'hw_address':device.hw_address.toLowerCase()},{
+        'active'      : device.active,
+        'heartbeat'   : device.heartbeat,
+        'rssi_value'  : device.rssi_value,
+        'rota_pref'   : device.pref_route,
+        'rank_rpl'    : device.rank_rpl,
+        'link_metric' : device.link_metric,
+        'ipv6_global' : device.global_ipv6,
+        'ipv6_local'  : device.local_ipv6,
+        'updated'     : device.update,
+        'active'      : device.active,
+        'hw_address'  : device.hw_address.toLowerCase()
+      },function(err,node_data){
+        if (err) {
+          console.log('[Erro] ao atualizar nó no banco de dados: '+err);
+        }
+        else {
+          console.log('[MongoDB] Sucesso ao atualizar nó no banco de dados: [IPv6 Device]['+device.hw_address.toLowerCase()+']');
+        }
+      });
+    }
+    else
+      console.log('[MongoDB] Nó ainda não cadastrado no banco de dados');
+  });
+}
+
+function dataSaveDB(device){
+  console.log('[MongoDB] Salvando nós no banco de dados: [IPv6 Device]['+device.hw_address.toLowerCase()+']');
+  node.findOne({'hw_address':device.hw_address.toLowerCase()}, function(err,node_data){
+    if (err) {
+      console.log('[Erro] ao procurar nó no banco de dados: '+err);
+      throw err;
+    }
+    if (!node_data) {
+      var node_ipv6 = new node();
+      node_ipv6.active      = device.active;
+      node_ipv6.heartbeat   = device.heartbeat;
+      node_ipv6.rssi_value  = device.rssi_value;
+      node_ipv6.rota_pref   = device.pref_route;
+      node_ipv6.rank_rpl    = device.rank_rpl;
+      node_ipv6.link_metric = device.link_metric;
+      node_ipv6.ipv6_global = device.global_ipv6;
+      node_ipv6.ipv6_local  = device.local_ipv6;
+      node_ipv6.updated     = device.update;
+      node_ipv6.active      = device.active;
+      node_ipv6.hw_address  = device.hw_address;
+
+      node_ipv6.save(function(err) {
+          if (err){
+            console.log('[Erro] ao salvar nó no banco de dados: '+err);
+            throw err;
+          }
+      });
+    }
+  });
 }
 
 function init_snmp_can(){
