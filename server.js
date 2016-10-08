@@ -1,14 +1,15 @@
 // server.js
 // set up ======================================================================
 // get all the tools we need
-var express  = require('express');
-var app      = express();
-var port     = process.env.PORT || 8888;
-var mongoose = require('mongoose');
-var passport = require('passport');
-var flash    = require('connect-flash');
-var mongoCon = require('./config/database.js');
-var path     = require('path');
+var express   = require('express');
+var app       = express();
+var port      = process.env.PORT || 8888;
+var mongoose  = require('mongoose');
+var passport  = require('passport');
+var flash     = require('connect-flash');
+var mongoCon  = require('./config/database');
+var path      = require('path');
+var snmp_scan = require('./backend/scripts/snmp_scan');
 
 var morgan       = require('morgan');
 var cookieParser = require('cookie-parser');
@@ -46,7 +47,8 @@ console.log(path.join(__dirname, 'dist'));
 // routes ======================================================================
 require('./backend/routes.js')(app, passport); // load our routes and pass in our app and fully configured passport
 
-// launch ======================================================================
+// launch scripts & express ====================================================
+snmp_scan.init_snmp_can();
 
 app.listen(port);
 console.log('[HomeStark] Server open on port:' + port);

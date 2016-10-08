@@ -7,3 +7,9 @@ homeStarkController.controller('loginCtrl',['$scope',function ($scope) {
   };
 
 }]);
+
+homeStarkController.controller('dashCtrl',['$scope',function ($scope) {
+  $scope.isNavCollapsed = true;
+  $scope.isCollapsed = false;
+  $scope.isCollapsedHorizontal = false;
+}]);

@@ -13,6 +13,7 @@
     <link rel="stylesheet" type="text/css" href="components/parsleyjs/src/parsley.css"/>
     <link rel="stylesheet" type="text/css" href="components/semantic/dist/semantic.min.css"/>
     <link rel="stylesheet" type="text/css" href="components/angular-video-background/src/video-background.css"/>
+    <link rel="stylesheet" type="text/css" href="css/style.css"/>
     <!-- endbuild -->
 
     <!-- SCRIPTS -->
@@ -28,12 +29,67 @@
 
     <!-- Custom Scripts -->
     <script type="text/javascript" src="js/homestark.min.js"></script>
+
+    <script type="text/javascript">
+    $(document).ready(function(){
+      $(".push_menu").click(function(){
+           $(".wrapper").toggleClass("active");
+      });
+      $('.menu li a').click(function(e) {
+          e.preventDefault();
+          $('a').removeClass('active');
+          $(this).addClass('active');
+      });
+    });
+    </script>
 </head>
 <body>
-<div class="container">
-    <div class="row">
-      Esqueleto da dash
+	<nav class="navbar navbar-default navbar-fixed-top home_style" role="navigation">
+    <div class="container">
+      <div class="navbar-header">
+        <a href="#"><img class="pull-left" src="img/logo_symbol.png" width="5%" heigth="auto" style="margin-top:1%;" alt="HomeStark"/></a>
+        <a href="#" id="ntext" style="margin-left:1%; font-size:large; font-style?" class="navbar-text logo_homestark">HomeStark</a>
+      </div>
+      <span class="navbar-text navbar-right"><a href="#" style="text-decoration: none; margin-right: 10px;" class="logo_homestark"><i class="fa fa-sign-out" aria-hidden="true"></i>Logout</a></span>
     </div>
-</div>
+	</nav>
+
+  <div class="container container_left">
+  	<div class="row">
+  		<div class="wrapper">
+	      <div class="side-bar">
+          <ul>
+            <li class="menu-head">
+                Menu <a  href="#" class="push_menu"><span class="glyphicon glyphicon-align-justify pull-right"></span></a>
+            </li>
+            <div class="menu">
+                <li >
+                    <a id="link_1" class="active"  href="#">Dashboard<span class="glyphicon glyphicon-cloud pull-right"></span></a>
+                </li>
+                <li >
+                    <a id="link_2" class="" href="#">Dispositivos<span class="glyphicon glyphicon-tasks pull-right"></span></a>
+                </li>
+                <li >
+                    <a id="link_3" class="" href="#/about">Configurações <span class="glyphicon glyphicon-cog pull-right"></span></a>
+                </li>
+            </div>
+          </ul>
+  	    </div>
+  		</div>
+  	</div>
+  </div>
+
+  <div id="page-content-wrapper">
+    <div class="container-fluid">
+        <!-- Main Content -->
+        <div id="mainWindow" class="row">
+          <div ng-view></div>
+        </div>
+    </div>
+  </div>
+  <!-- Main Content -->
+  <!-- <div id="mainWindow" class="col-xs-11">
+    <div ng-view></div>
+  </div> -->
 </body>
 </html>

@@ -32,6 +32,7 @@ var oids =  [{oid_value:["1.3.6.1.2.1.4.2.0"]},   // Local IPv6
              {oid_value:["1.3.6.1.2.1.25.4.0"]},  // Link Metric
              {oid_value:["1.3.6.1.2.1.25.5.0"]}]; // Hardware Address
 
+var exports = module.exports = {};
 /*************************** Trap treatment of device *************************/
 var trapd   = snmp.createTrapListener();
 
@@ -281,6 +282,7 @@ function verifAliveDevices(){
         // devices_list.splice(index,1); // We just inactive first
         devices_list[index].active = false;
         devices_list[index].poll = false;
+        dataUpdateDB(devices_list[index]);
       }
       else
         devices_list[index].poll = false; //Refresh the status to new scan ~50 seconds
@@ -310,18 +312,18 @@ function dataUpdateDB(device){
         if (err) {
           console.log('[Erro] ao atualizar nó no banco de dados: '+err);
         }
-        else {
-          console.log('[MongoDB] Sucesso ao atualizar nó no banco de dados: [IPv6 Device]['+device.hw_address.toLowerCase()+']');
-        }
+        // else {
+        //  console.log('[MongoDB] Sucesso ao atualizar nó no banco de dados: [IPv6 Device]['+device.hw_address.toLowerCase()+']');
+        // }
       });
     }
-    else
-      console.log('[MongoDB] Nó ainda não cadastrado no banco de dados');
+    // else
+    //   console.log('[MongoDB] Nó ainda não cadastrado no banco de dados');
   });
 }
 
 function dataSaveDB(device){
-  console.log('[MongoDB] Salvando nós no banco de dados: [IPv6 Device]['+device.hw_address.toLowerCase()+']');
+  // console.log('[MongoDB] Salvando nós no banco de dados: [IPv6 Device]['+device.hw_address.toLowerCase()+']');
   node.findOne({'hw_address':device.hw_address.toLowerCase()}, function(err,node_data){
     if (err) {
       console.log('[Erro] ao procurar nó no banco de dados: '+err);
@@ -351,11 +353,11 @@ function dataSaveDB(device){
   });
 }
 
-function init_snmp_can(){
+var init_snmp_can = function(){
   // Init the timer to send GET SNMP Messages
   setTimeout(reqGetSNMP, constants.timeSNMPRequest);
   // Init the timer to verify if the devices are alive
   setTimeout(verifAliveDevices, constants.timeCheckList);
 }
 
-init_snmp_can();
+exports.init_snmp_can = init_snmp_can;

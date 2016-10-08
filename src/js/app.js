@@ -14,11 +14,11 @@ hero.config(['$routeProvider',function($routeProvider) {
       controller: ''
     }).
     when('/about', {
-      templateUrl: '/pages/about.ejs',
+      templateUrl: '/pages/windows/about.ejs',
       controller: ''
     }).
     otherwise({
-      redirectTo: '/control',
+      redirectTo: '/about',
       controller: ''
     });
 }]);
