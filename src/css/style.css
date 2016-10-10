@@ -1,169 +1,26 @@
-.img-responsive {
-    height: auto;
-    width: auto;
-    max-height: 72px;
-    max-width: 250px;
-}
-.sidebar {
-  list-style-type: none;
-  width: 5%;
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  background-color: blue;
-  z-index: -100;
-}
-.logo_homestark{
-  font-weight: bold;
-  color: white;
-}
-.home_style{
-  background: rgba(0,0,0,0.8);
-  border-color: black;
-}
-.nav.navbar-nav.navbar-right li a {
-    color: white;
-}
-#ntext{
-  color: white;
-  text-decoration: none;
-}
-/* unvisited link */
-a:link {
-    color: white;
-}
-
-/* visited link */
-a:visited {
-    color: white;
-}
-
-/* mouse over link */
-a:hover {
-    color: gray;
-}
-
-/* selected link */
-a:active {
-    color: grey;
-}
-
 /*******************************  SIDEBAR LEFT  *******************************/
-@import url(http://fonts.googleapis.com/css?family=Lato);
-
-.container_left
-{
-    margin-top: 50px;
-    width:800px;
-    overflow:hidden;
-    display:inline-block;
-}
-.side-bar
-{
-    background:#d4d4d5;
-    position:absolute;
-    height:100%;
-    width:200px;
-    color:#fff;
-    transition: margin-left 0.5s;
+.nav, .pagination, .carousel, .panel-title a {
+   cursor: pointer;
 }
 
-.side-bar ul
-{
-    list-style:none;
-    padding:0px;
-
+@font-face {
+  font-family: 'Montserrat';
+  font-style: normal;
+  font-weight: 400;
+  src: url(../fonts/index.eot);
+  src: local('Montserrat-Regular'),
+  url(../fonts/index.eot) format('embedded-opentype'),
+  url(../fonts/index.woff)
+  format('woff');
 }
 
-.side-bar ul li.menu-head
-{
-    font-family: 'Lato', sans-serif;
-    padding:20px;
-    color:black;
+/******************** Left - user and sidebar ********************/
+/*index.ejs*/
+.sid_ido {
+  width: 20px;
+  height: auto;
+  margin-bottom: 32px;
 }
-
-
-.side-bar ul li.menu-head a
-{
-    /*color:#fff;*/
-    text-decoration:none;
-    height:50px;
-    color:black;
-
-}
-
-
-.side-bar ul .menu-head  a
-{
-    color:#fff;
-    text-decoration:none;
-    height:50px;
-}
-
-.side-bar ul .menu li  a
-{
-    /*color:#fff;*/
-    color:black;
-    text-decoration:none;
-    display:inline-table;
-    width:100%;
-    padding-left:20px;
-    padding-right:20px;
-    padding-top:10px;
-    padding-bottom:10px;
-}
-
-.side-bar ul .menu li  a:hover
-{
-    border-left:3px solid #ECECEA;
-    padding-left:17px;
-}
-
-.side-bar ul .menu li  a.active
-{
-    padding-left:17px;
-    background:#333333;
-    border-left:3px solid #6435c9;
-    color:white;
-}
-
-.side-bar ul .menu li  a.active:before {
-   content:"";
-   position: absolute;
-   width: 0;
-   height: 0;
-   border-top: 20px solid transparent;
-   border-bottom: 20px solid transparent;
-   border-left: 7px solid #333333;
-   margin-top: -10px;
-   margin-left: 180px;
-   color: white;
-}
-
-
-.content
-{
-    padding-left: 200px;
-    transition: padding-left 0.5s;
-}
-
-.active > .side-bar
-{
-    margin-left:-150px;
-    transition: margin-left 0.5s;
-}
-
-.active > .content
-{
-    padding-left:50px;
-    transition: padding-left 0.5s;
-}
-
-
-
-
-
-
 
 #sidebar-wrapper .menu-icon{
   width: 30px;
@@ -175,6 +32,137 @@ a:active {
   text-align:  center;
 }
 
+#user-wrapper{
+  position: absolute;
+  bottom: 0px;
+  width: 100%;
+  height: 150px;
+  text-align: center;
+}
+
+#wrapper.toggled #user-wrapper{
+    display: none;
+}
+
+.untoggled{
+  text-align: left;
+}
+
+/******************** Top - Page Indicator ********************/
+/*sidebar and top bar from index.ejs*/
+#pageIndicator{
+  height:30px;
+}
+
+#controlBar .user{
+  width:  50px;
+  height: auto;
+}
+
+/*pagination.ejs */
+#top-menu .pagination>.active>a{
+  border-color:black;
+  color:white;
+  background-color: black;
+}
+
+#top-menu a{
+  background-color: white;
+  color: black;
+  font-weight:bold;
+
+}
+
+#top-menu a:active{
+  border-color:black;
+}
+
+#top-menu a:focus
+{
+    color: white;
+    border-color:black;
+
+}
+
+#top-menu a:hover{
+    color: black;
+    border-color:black;
+
+}
+/******************** Center - Main Window ********************/
+/*dash.ejs*/
+.switch.checked {
+  color: black;
+  background-color: black;
+}
+
 #mainWindow{
-  background-color: orange;
+  /*background-color: orange;*/
+}
+
+/*time.ejs*/
+.btn-link {
+  color: black;
+}
+
+canvas.chart{
+    width: 100% !important;
+    /*height: auto !important;*/
+}
+
+.highcharts-container{width:100% !important; height:100% !important;}
+
+/*dash.ejs - Main screen  css for widgets*/
+.groups{
+  height: 330px;
+}
+
+.widget{
+  height: 300px;
+  /*background-color: red;*/
+  text-align: center;
+  /*border: 1px solid rgba(207,207,207,0.61);*/
+  /*border-radius: 6px;*/
+}
+
+#slider .slider-tick{
+	background: #014A94;
+}
+
+#slider .in-selection{
+	background: #D28800;
+}
+
+#slider .slider-handle {
+	background: #D28800;
+}
+
+#slider .slider-selection {
+	background: #F9B333;
+}
+
+.row{
+  margin-left: 15px;
+  margin-right: 15px;
+}
+
+/*power.ejs*/
+.iconGroup{
+  color: black;
+  text-decoration: none;
+}
+
+.sample-show-hide {
+  padding:10px;
+  border:1px solid black;
+  background:white;
+}
+
+.sample-show-hide {
+  -webkit-transition:all linear 0.5s;
+  transition:all linear 0.5s;
+}
+
+.sample-show-hide.ng-hide {
+  opacity:0;
 }

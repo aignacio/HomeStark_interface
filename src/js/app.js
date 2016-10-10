@@ -13,6 +13,10 @@ hero.config(['$routeProvider',function($routeProvider) {
       templateUrl: '/pages/dash.ejs',
       controller: ''
     }).
+    when('/devices', {
+      templateUrl: '/pages/windows/devices.ejs',
+      controller: ''
+    }).
     when('/about', {
       templateUrl: '/pages/windows/about.ejs',
       controller: ''
