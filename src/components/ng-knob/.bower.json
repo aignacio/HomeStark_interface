@@ -38,6 +38,6 @@
     "commit": "fa096d0cb8886ea55078d91e8a3a91e269f0e901"
   },
   "_source": "https://github.com/RadMie/ng-knob.git",
-  "_target": "~0.1.1",
+  "_target": "^0.1.3",
   "_originalSource": "ng-knob"
 }

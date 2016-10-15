@@ -1,0 +1,22 @@
+<div class="row">
+  <div style="text-align:center; font-size: larger;" class="row">
+    Sensor do tipo:<br>
+    <b><i class="fa fa-toggle-off" aria-hidden="true"></i></i> {{dash.type}}</b>
+  </div>
+  <br>
+  <style media="screen">
+  .switch.checked {
+    background: black;
+    border-color: black;
+  }
+  </style>
+  <!-- <div style="text-align:center;" class="row">
+    <span style="font-size: larger;">Valor:<b>{{dash.value}}</b></span>
+  </div> -->
+  <div style="text-align:center;" class="row">
+    <form>
+      <switch id="enabled" name="enabled" ng-model="dash.value" class="wide black" ng-click="toggleSwitch(dash.value,dash.hw,dash.type);"></switch>
+      <br>{{ enabled }}
+    </form>
+  </div>
+</div>

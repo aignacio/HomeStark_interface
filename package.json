@@ -4,6 +4,7 @@
   "dependencies": {
     "bcrypt-nodejs": "latest",
     "body-parser": "latest",
+    "coap": "^0.18.0",
     "colors": "latest",
     "connect-flash": "latest",
     "cookie-parser": "latest",

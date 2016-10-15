@@ -26,7 +26,7 @@ var global_device_index = 0,
 var oids =  [{oid_value:["1.3.6.1.2.1.4.2.0"]},   // Local IPv6
              {oid_value:["1.3.6.1.2.1.4.20.0"]},  // Global IPV6
              {oid_value:["1.3.6.1.2.1.4.21.0"]},  // Rota preferencial
-             {oid_value:["1.3.6.1.2.1.25.1.0"]},  // Heartbeat
+             {oid_value:["1.3.6.1.2.1.25.1.0"]},  // Tipo de dispositivo
              {oid_value:["1.3.6.1.2.1.25.2.0"]},  // RSSI
              {oid_value:["1.3.6.1.2.1.25.3.0"]},  // Rank RPL
              {oid_value:["1.3.6.1.2.1.25.4.0"]},  // Link Metric
@@ -58,6 +58,7 @@ trapd.on('trap', function(msg){
     // \rAtualizando status do dispositivo: '+devices_list[exists].address_ipv6.white+' com active='+'true'.blue);
     devices_list[exists].active = true;
     devices_list[exists].poll = true;
+    devices_list[exists].try = 0;
   }
   else {
     if (debug_snmp)
@@ -66,7 +67,7 @@ trapd.on('trap', function(msg){
       address_ipv6:address_node,
       active:true,
       poll:true,
-      heartbeat:'---',
+      type_device:'---',
       rssi_value:'---',
       pref_route:'---',
       rank_rpl:'---',
@@ -74,6 +75,7 @@ trapd.on('trap', function(msg){
       global_ipv6:'---',
       local_ipv6:'---',
       hw_address: hw_trap,
+      try: 0,
       update: new Date().toISOString()
     };
     devices_list.push(node);
@@ -86,11 +88,13 @@ trapd.bind({family: 'udp6', port: 162});
 function processSNMP(oid, value){
   var data_vector = value.split("-");
 
+
   for (var i = 0; i < devices_list.length; i++){
     var final_ipv6 = devices_list[i].address_ipv6.split(":");
     if (data_vector[0].toLowerCase().search(final_ipv6[final_ipv6.length-1].toLowerCase()) > -1)
       break;
   }
+
 
   var content = data_vector[2];
   content = String(content);
@@ -107,8 +111,8 @@ function processSNMP(oid, value){
       devices_list[i].pref_route = content.replace(/[\[\]']/g,'' );
       break;
     }
-    else if (oid == oids[3].oid_value){     // Heartbeat
-      devices_list[i].heartbeat = content;
+    else if (oid == oids[3].oid_value){     // type_device
+      devices_list[i].type_device = content;
       break;
     }
     else if (oid == oids[4].oid_value){     // RSSI
@@ -136,6 +140,7 @@ function processSNMP(oid, value){
     console.log('[GET-RESPONSE]'.black.bgWhite+' ['+oid.magenta+'] '+emoji.get(':arrow_right:')+' ['+nms_add.white+'] '+emoji.get(':arrow_left:')+emoji.get(':arrow_left:')+emoji.get(':arrow_left:')+' ['+devices_list[i].address_ipv6.white+']');
   }
 
+  devices_list[i].try = 0;
   devices_list[i].active = true;
   devices_list[i].poll = true;
   // Saving data to MongoDB
@@ -176,7 +181,7 @@ function listDevices(special_feature){
         var addr        = devices_list[index].address_ipv6,
             dev_stat    = devices_list[index].active,
             poll        = devices_list[index].poll,
-            heartbeat   = devices_list[index].heartbeat
+            type_device = devices_list[index].type_device
             rssi_value  = devices_list[index].rssi_value,
             pref_route  = devices_list[index].pref_route,
             rank_rpl    = devices_list[index].rank_rpl,
@@ -199,7 +204,7 @@ function listDevices(special_feature){
         poll = String(poll);
         console.log('Status      :['+dev_stat.white+']');
         console.log('Poll        :['+poll.white+']');
-        console.log('heartbeat   :['+heartbeat.white+']');
+        console.log('Tipo        :['+type_device.white+']');
         console.log('RSSI(-x dBm):['+rssi_value.white+']');
         console.log('Rota pref.  :['+pref_route.white+']');
         console.log('Rank RPL    :['+rank_rpl.white+']');
@@ -236,14 +241,23 @@ function reqGetSNMP(){
     //   console.log('Requisitando dados SNMP dos dispositivos...'.underline.white);
 
     var dev_get = devices_list[global_device_index].address_ipv6,
-        oid_get = oids[global_oid_index].oid_value;
+        oid_get = oids[global_oid_index].oid_value,
+        tries = devices_list[global_device_index].try;
     // console.log('Enviando GET OID para:'+devices_list[0].address_ipv6.white);
 
     if (debug_snmp)
       console.log('[GET]'.black.bgWhite+' OID: ['+String(oid_get).magenta+'] '+emoji.get(':arrow_right:')+' ['+nms_add.white+'] '+emoji.get(':arrow_right:')+emoji.get(':arrow_right:')+emoji.get(':arrow_right:')+' ['+dev_get.white+']');
 
-    var session = snmp_net.createSession (dev_get, "public",options);
-    session.get(oid_get, cbSNMPnodes);
+    if (tries < 2) {
+      if (devices_list[global_device_index].active == true) {
+        var session = snmp_net.createSession (dev_get, "public",options);
+        session.get(oid_get, cbSNMPnodes);
+        devices_list[global_device_index].try += 1;
+      }
+    }
+    else {
+      devices_list[global_device_index].active = false;
+    }
 
     if (global_device_index < (devices_list.length-1)){
       global_device_index++
@@ -298,7 +312,7 @@ function dataUpdateDB(device){
     if (node_data) {
       node.update({'hw_address':device.hw_address.toLowerCase()},{
         'active'      : device.active,
-        'heartbeat'   : device.heartbeat,
+        'type_device' : device.type_device,
         'rssi_value'  : device.rssi_value,
         'rota_pref'   : device.pref_route,
         'rank_rpl'    : device.rank_rpl,
@@ -332,7 +346,7 @@ function dataSaveDB(device){
     if (!node_data) {
       var node_ipv6 = new node();
       node_ipv6.active      = device.active;
-      node_ipv6.heartbeat   = device.heartbeat;
+      node_ipv6.type_device = device.type_device;
       node_ipv6.rssi_value  = device.rssi_value;
       node_ipv6.rota_pref   = device.pref_route;
       node_ipv6.rank_rpl    = device.rank_rpl;
@@ -353,11 +367,46 @@ function dataSaveDB(device){
   });
 }
 
+function getDBnodes(){
+  node.find({}, function (err, nodes) {
+    if (nodes) {
+      for (var i = 0; i < nodes.length; i++) {
+        var node = {
+          address_ipv6:nodes[i].ipv6_global,
+          active:nodes[i].active,
+          poll:false,
+          type_device:'---',
+          rssi_value:'---',
+          pref_route:'---',
+          rank_rpl:'---',
+          link_metric:'---',
+          global_ipv6:'---',
+          local_ipv6:'---',
+          hw_address:nodes[i].hw_address,
+          update:nodes[i].updated
+        };
+        devices_list.push(node);
+      }
+    }
+  });
+}
+
+function deleteDBnodes(){
+  node.remove({}, function (err, nodes) {
+  });
+}
+
 var init_snmp_can = function(){
+  console.log("SNMP Scan ativo...");
+  // Get devices from database
+  // getDBnodes();
+  deleteDBnodes();
   // Init the timer to send GET SNMP Messages
   setTimeout(reqGetSNMP, constants.timeSNMPRequest);
   // Init the timer to verify if the devices are alive
   setTimeout(verifAliveDevices, constants.timeCheckList);
 }
 
+// mongoCon(0);
+// init_snmp_can();
 exports.init_snmp_can = init_snmp_can;

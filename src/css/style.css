@@ -14,6 +14,25 @@
   format('woff');
 }
 
+.color-green {
+  color: green;
+}
+
+.color-blue {
+  color: blue;
+}
+
+.color-red {
+  color: red;
+}
+
+.color-yellow {
+  color: yellow;
+}
+
+.color-orange {
+  color: orange;
+}
 /******************** Left - user and sidebar ********************/
 /*index.ejs*/
 .sid_ido {
@@ -165,4 +184,32 @@ canvas.chart{
 
 .sample-show-hide.ng-hide {
   opacity:0;
+}
+
+.table_center{
+  text-align: center;
+}
+
+
+/********************************** DASHBOARD *********************************/
+body {
+    /*font-family: 'Helvetica Neue', Arial, sans-serif;*/
+    /*background: #004756;*/
+    /*color: #fff;*/
+}
+.gridster .gridster-item {
+    -webkit-box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    -moz-box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    color: black;
+    background: #ffffff;
+    padding: 10px;
+    min-width: 278px;
+    min-height: 262px;
+}
+
+.vertical_align{
+  text-align: center;
+  display: table-cell;
+  vertical-align: middle;
 }

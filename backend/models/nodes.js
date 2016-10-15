@@ -11,7 +11,7 @@ var nodesSchema = new mongoose.Schema({
       type: Boolean
       ,required: true
     }
-    ,heartbeat: {
+    ,type_device: {
       type: String
     }
     ,rssi_value: {
@@ -30,6 +30,9 @@ var nodesSchema = new mongoose.Schema({
       type: String
     }
     ,ipv6_local:{
+      type: String
+    }
+    ,value:{
       type: String
     }
     ,created: {

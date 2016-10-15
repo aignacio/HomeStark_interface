@@ -10,6 +10,7 @@ var flash     = require('connect-flash');
 var mongoCon  = require('./config/database');
 var path      = require('path');
 var snmp_scan = require('./backend/scripts/snmp_scan');
+var coap_req  = require('./backend/scripts/coap_req');
 
 var morgan       = require('morgan');
 var cookieParser = require('cookie-parser');
@@ -49,6 +50,7 @@ require('./backend/routes.js')(app, passport); // load our routes and pass in ou
 
 // launch scripts & express ====================================================
 snmp_scan.init_snmp_can();
+coap_req.init_coap();
 
 app.listen(port);
 console.log('[HomeStark] Server open on port:' + port);

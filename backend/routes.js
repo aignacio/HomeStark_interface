@@ -1,4 +1,7 @@
 // app/routes.js
+var node = require('../backend/models/nodes');
+var dev_dash = require('../backend/models/dash');
+
 module.exports = function(app, passport) {
 
     // =====================================
@@ -59,6 +62,25 @@ module.exports = function(app, passport) {
     // =====================================
     // Main routes for mongodb
 
+    // Get the devices to list
+    app.get('/devices/list', function(req, res) {
+      node.find({}, function (err, nodes) {
+        res.send(nodes);
+      });
+    });
+
+    // Get the dash sensors to list in dashboard
+    app.get('/dash/list', function(req, res) {
+      dev_dash.find({}, function (err, dash) {
+        res.send(dash);
+      });
+    });
+
+    // Set data from dashboard
+    app.post('/dash/setData', function(req, res) {
+      console.log(req.body);
+      res.send('ok');
+    });
 };
 
 // route middleware to make sure a user is logged in

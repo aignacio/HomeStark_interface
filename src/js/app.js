@@ -10,7 +10,7 @@ hero.config(['$controllerProvider',
 hero.config(['$routeProvider',function($routeProvider) {
   $routeProvider.
     when('/dash', {
-      templateUrl: '/pages/dash.ejs',
+      templateUrl: '/pages/windows/dashboard.ejs',
       controller: ''
     }).
     when('/devices', {
@@ -22,7 +22,7 @@ hero.config(['$routeProvider',function($routeProvider) {
       controller: ''
     }).
     otherwise({
-      redirectTo: '/about',
+      redirectTo: '/dash',
       controller: ''
     });
 }]);
