@@ -1,6 +1,7 @@
 // app/routes.js
 var node = require('../backend/models/nodes');
 var dev_dash = require('../backend/models/dash');
+var coap = require('coap');
 
 module.exports = function(app, passport) {
 
@@ -78,10 +79,77 @@ module.exports = function(app, passport) {
 
     // Set data from dashboard
     app.post('/dash/setData', function(req, res) {
-      console.log(req.body);
+      var temp = req.body;
+      // console.log(temp.hw_assoc);
+
+      switch (temp.type) {
+        case 'switch':
+          changeSwitch(temp);
+          break;
+        case 'toggle':
+          toggleSensor(temp);
+        default:
+      }
       res.send('ok');
     });
+
+    // Get data of sensor in dash
+    app.post('/dash/GetSensor', function(req, res) {
+      var temp = req.body;
+      // console.log(temp.hw);
+      node.findOne({'hw_address':temp.hw},function(err,sensor){
+          if (sensor)
+            res.send(sensor);
+          else
+            res.send('Não existe');
+      });
+    });
+
+    // Save name of sensor
+    app.post('/dash/SaveDash', function(req, res) {
+      var temp = req.body;
+      // console.log(temp.hw);
+      dev_dash.update({ $and : [
+                      {'hw_assoc':temp.hw},
+                      {'type':temp.type}]},
+      { 'name' : temp.name }, function(err,node_data){
+        if (err) {
+          console.log('[Erro] ao atualizar dash no banco de dados: '+err);
+        }
+      });
+    });
 };
+
+function toggleSensor(data){
+  node.findOne({'hw_address':data.hw_assoc}, function(err,node_data){
+    if (node_data) {
+      var req = coap.request({host:node_data.ipv6_global,
+                              pathname:'/test/hello',
+                              method:'GET',
+                              confirmable:false});
+      req.setOption('Content-Format', 'text/plain');
+      req.end();
+    }
+  });
+}
+
+function changeSwitch(data){
+  node.findOne({'hw_address':data.hw_assoc}, function(err,node_data){
+    if (node_data) {
+      var req = coap.request({host:node_data.ipv6_global,
+                              pathname:'/'+data.type,
+                              method:'POST',
+                              confirmable:false});
+      if (data.value === true)
+        data.value = 1;
+      else
+        data.value = 0;
+      req.write('switch_value='+data.value);
+      req.setOption('Content-Format', 'text/plain');
+      req.end();
+    }
+  });
+}
 
 // route middleware to make sure a user is logged in
 function isLoggedIn(req, res, next) {

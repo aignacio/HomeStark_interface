@@ -1,11 +1,16 @@
 var hero = angular.module('superhero', ['ui.bootstrap',
                                         'ngRoute',
-                                        'homeStarkControllers']);
+                                        'homeStarkControllers',
+                                        'xeditable']);
 hero.config(['$controllerProvider',
   function($controllerProvider) {
     $controllerProvider.allowGlobals();
   }
 ]);
+
+hero.run(['editableOptions',function(editableOptions) {
+  editableOptions.theme = 'bs3';
+}]);
 
 hero.config(['$routeProvider',function($routeProvider) {
   $routeProvider.

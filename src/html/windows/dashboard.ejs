@@ -2,6 +2,9 @@
 	<h2 style="text-align:center;"><span class="fa fa-cubes"></span> Dashboard:</h2>
 	<br>
 	<div class="row" ng-controller="dashCtrl">
+		<div ng-show="showUpdate">
+			<th-spinner theme="'windcatcher'" display="'true'" size="'size-lg'"></th-spinner>
+		</div>
     <div gridster="gridsterOpts">
         <ul>
             <li gridster-item="dash" ng-repeat="dash in dash_sensors">

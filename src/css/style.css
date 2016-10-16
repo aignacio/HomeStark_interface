@@ -3,6 +3,10 @@
    cursor: pointer;
 }
 
+.underline-on-hover:hover {
+		text-decoration: underline;
+}
+
 @font-face {
   font-family: 'Montserrat';
   font-style: normal;

@@ -2,7 +2,8 @@ var homeStarkController = angular.module('homeStarkControllers', ['ui.bootstrap'
                                                                   'ngRoute',
                                                                   'gridster',
                                                                   'ui.knob',
-                                                                  'uiSwitch']);
+                                                                  'uiSwitch',
+                                                                  'angular-theme-spinner']);
 
 homeStarkController.controller('loginCtrl',['$scope',function ($scope) {
   $scope.loadLogin = function(){
@@ -48,7 +49,7 @@ homeStarkController.controller('devicesCtrl',['$scope','$http','$timeout',functi
   refreshDevices();
 }]);
 
-homeStarkController.controller('dashCtrl',['$scope','$timeout','$http',function($scope,$timeout,$http){
+homeStarkController.controller('dashCtrl',['$scope','ShareDash','$uibModal','$timeout','$http',function($scope,ShareDash,$uibModal,$timeout,$http){
   $scope.gridsterOpts = {
       columns: 6, // the width of the grid, in columns
       pushing: true, // whether to push other items out of the way on move or resize
@@ -87,6 +88,7 @@ homeStarkController.controller('dashCtrl',['$scope','$timeout','$http',function(
         //  stop: function(event, $element, widget) {} // optional callback fired when item is finished dragging
       }
   };
+
   $scope.dash_sensors = [
     // { sizeX: 1, sizeY: 1},
     // { sizeX: 1, sizeY: 1},
@@ -136,10 +138,10 @@ homeStarkController.controller('dashCtrl',['$scope','$timeout','$http',function(
     $timeout.cancel(refreshSensors);
   });
 
-  $scope.toggleSwitch = function(bt_st,hw,type_c){
+  $scope.toggleSensor = function(bt_st,hw,type_c){
     // console.log('BOTAO:'+bt_st+' HW:'+hw+' Tipo:'+type);
-    var data = [];
-    data.push({hw_assoc:hw,value:bt_st,type:type_c});
+    var data ={hw_assoc:hw,
+               type:'toggle'};
     $http({
       url: '/dash/setData', // No need of IP address
       method: 'POST',
@@ -147,7 +149,31 @@ homeStarkController.controller('dashCtrl',['$scope','$timeout','$http',function(
       headers: {'Content-Type': 'application/json'}
     }).then(function(response) {
       // if(response.data.status=='ok'){
-        console.log("Valor da chave enviada ao sensor!");
+      //  console.log("Valor da chave enviada ao sensor!");
+      // }
+      // else
+      //   console.log("Não foi possível enviar o valor da chave!");
+    }, function(response) {
+      $scope.data = response.data || "Request failed";
+      $scope.status = response.status;
+      console.log($scope.status);
+    });
+    // alert('BOTAO:'+bt_st+' HW:'+hw+' Tipo:'+type);
+  };
+
+  $scope.toggleSwitch = function(bt_st,hw,type_c){
+    // console.log('BOTAO:'+bt_st+' HW:'+hw+' Tipo:'+type);
+    var data ={hw_assoc:hw,
+               value:bt_st,
+               type:type_c};
+    $http({
+      url: '/dash/setData', // No need of IP address
+      method: 'POST',
+      data: data,
+      headers: {'Content-Type': 'application/json'}
+    }).then(function(response) {
+      // if(response.data.status=='ok'){
+      //  console.log("Valor da chave enviada ao sensor!");
       // }
       // else
       //   console.log("Não foi possível enviar o valor da chave!");
@@ -162,11 +188,18 @@ homeStarkController.controller('dashCtrl',['$scope','$timeout','$http',function(
   function processSensors(sensors){
     var sensor_dash = [];
     for (var i = 0; i < sensors.length; i++) {
+      if (sensors[i].type == 'switch')
+        if (sensors[i].value == '0')
+          sensors[i].value = false;
+        else
+          sensors[i].value = true;
       sensor_dash.push({status:sensors[i].active,
                         sizeX: 1,
                         sizeY: 1,
                         type: sensors[i].type,
                         value: sensors[i].value,
+                        name: sensors[i].name,
+                        updated: sensors[i].updated,
                         hw: sensors[i].hw_assoc});
     }
     // console.log(sensor_dash);
@@ -175,13 +208,24 @@ homeStarkController.controller('dashCtrl',['$scope','$timeout','$http',function(
 
   function UpdateSensors(data){
     for (var i = 0; i < data.length; i++) {
+      if (data[i].type == 'switch')
+        if (data[i].value == '0')
+          data[i].value = false;
+        else
+          data[i].value = true;
       $scope.dash_sensors[i].status = data[i].status;
       $scope.dash_sensors[i].value = data[i].value;
+      $scope.dash_sensors[i].updated = data[i].updated;
     }
   }
 
+  var cancelUpdate = function(){
+      $scope.showUpdate = false;
+  };
+
   var refreshSensors = function() {
     time = $timeout(refreshSensors, 10000);
+    $scope.showUpdate = true;
     $http({method: 'GET', url: '/dash/list'}).
       then(function(response) {
         // for(var i=0;i<response.data.length;i++) {
@@ -190,6 +234,7 @@ homeStarkController.controller('dashCtrl',['$scope','$timeout','$http',function(
         //   else
         //     response.data[i].active = 'Inativo';
         // }
+        $timeout(cancelUpdate,3000);
         if (response.data.length > $scope.dash_sensors.length) {
           $scope.dash_sensors = processSensors(response.data);
         }
@@ -205,4 +250,75 @@ homeStarkController.controller('dashCtrl',['$scope','$timeout','$http',function(
   };
 
   refreshSensors();
+
+  $scope.dash = ShareDash;
+
+  $scope.editDash = function (hw,type,name,value,status,updated) {
+    $scope.dash.hw = hw;
+    $scope.dash.type = type;
+    $scope.dash.name = name;
+    $scope.dash.value = value;
+    $scope.dash.status = status;
+    $scope.dash.updated = updated;
+
+    var modalInstance = $uibModal.open({
+      size:'lg',
+      animation: true,
+      templateUrl: 'modal.html',
+      controller: 'modalDashCtrl'
+    });
+  };
+
 }]);
+
+homeStarkController.controller('modalDashCtrl', ['$scope','$timeout','$uibModalInstance','ShareDash','$http','$location', function ($scope, $timeout,$uibModalInstance, ShareDash, $http,$location) {
+  $scope.dash_sensor = ShareDash;
+
+  $http({ url: '/dash/GetSensor', // No need of IP address
+          method: 'POST',
+          data:{'hw':$scope.dash_sensor.hw},
+          headers: {'Content-Type': 'application/json'}
+  }).then(function(response) {
+      if(response.data.active === true)
+        response.data.active = 'Ativo';
+      else
+        response.data.active = 'Inativo';
+      $scope.sensor = response.data;
+      // console.log('Sensor:'+$scope.sensor);
+    }, function(response) {
+      $scope.data = response.data || "Request failed";
+      $scope.status = response.status;
+      console.log($scope.status);
+  });
+
+  $scope.saveCfg = function (){
+    $http({ url: '/dash/SaveDash',
+            method: 'POST',
+            data:{name:$scope.dash_sensor.name,type:$scope.dash_sensor.type,hw:$scope.dash_sensor.hw},
+            headers: {'Content-Type': 'application/json'}
+    }).then(function(response) {
+      console.log("Alterações salvas!");
+      }, function(response) {
+        $scope.data = response.data || "Request failed";
+        $scope.status = response.status;
+        console.log($scope.status);
+    });
+  };
+
+  $scope.cancel = function () {
+    $uibModalInstance.dismiss();
+  };
+}]);
+
+homeStarkController.service('ShareDash', function () {
+    var dash = {
+      hw:'',
+      type:'',
+      value:'',
+      name:'',
+      status:'',
+      updated:''
+    };
+
+    return dash;
+});
