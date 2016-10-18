@@ -193,7 +193,8 @@ function scan_coapDevices(){
   console.log('[CoAP]'.red.bgBlack+' Requisitando dados...');
   if (devices.length > 0) {
     if (devices[global_devices_index].global_ipv6 != '---' &&
-        devices[global_devices_index].type_device != '---') {
+        devices[global_devices_index].type_device != '---' &&
+        devices[global_devices_index].active != false) {
       switch (devices[global_devices_index].type_device) {
         case 'device_water':
           req = coap.request({host:devices[global_devices_index].ipv6_global,
