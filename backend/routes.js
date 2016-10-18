@@ -2,6 +2,7 @@
 var node = require('../backend/models/nodes');
 var dev_dash = require('../backend/models/dash');
 var coap = require('coap');
+var sha256 = require('sha256');
 
 module.exports = function(app, passport) {
 
@@ -133,6 +134,10 @@ function toggleSensor(data){
   });
 }
 
+function n(n){
+    return n > 9 ? "" + n: "0" + n;
+}
+
 function changeSwitch(data){
   node.findOne({'hw_address':data.hw_assoc}, function(err,node_data){
     if (node_data) {
@@ -144,7 +149,13 @@ function changeSwitch(data){
         data.value = 1;
       else
         data.value = 0;
-      req.write('switch_value='+data.value);
+      var node_s = node_data.ipv6_global.split(':')[5];
+      node_s = node_s.toUpperCase();
+      var hashTomount = node_s+'&switch_value='+data.value;
+      var hashReady = sha256(hashTomount,{ asBytes: true });
+      var message = 'h='+hashReady[0].toString(16)+hashReady[31].toString(16)+'&switch_value='+data.value;
+      req.write(message);
+      console.log("[CoAP] Mensagem enviado ao nó:".red.bgBlack+'['+ node_data.ipv6_global+'] --> '+message);
       req.setOption('Content-Format', 'text/plain');
       req.end();
     }

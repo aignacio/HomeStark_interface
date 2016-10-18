@@ -32,6 +32,7 @@
     "passport-facebook": "latest",
     "passport-google-oauth": "latest",
     "passport-local": "latest",
-    "passport-twitter": "latest"
+    "passport-twitter": "latest",
+    "sha256": "^0.2.0"
   }
 }

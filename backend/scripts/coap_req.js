@@ -17,6 +17,7 @@
 var node = require('../models/nodes');
 var dash_dev = require('../models/dash');
 var constants = require('../var_constants');
+var sha256 = require('sha256');
 var coap = require('coap');
 var colors = require('colors');
 var req = coap.request('coap://[aaaa::1]/test/hello').end();
@@ -75,8 +76,8 @@ var global_devices_index = 0;
 function updateDash(device){ // Atualiza ou cria sensor de dash com base na resposta GET, no modelo [tipo_de_sensor=valor&tipo_de_sensor_2=valor....]
   // console.log("HARDWARE ADDRES:"+device.hw_address);
   var types = device.value.split('&');
-  for (var i = 0; i < types.length; i++) {
-    var typ_el = types[i].split('=');
+  // for (var i = 0; i < types.length; i++) {
+    var typ_el = types[1].split('=');
     // console.log("A salvar no banco: -> "+typ_el[1]);
     dash_dev.findOne({'hw_assoc':device.hw_address.toLowerCase(),
                       'type':typ_el[0].toLowerCase()},
@@ -117,7 +118,7 @@ function updateDash(device){ // Atualiza ou cria sensor de dash com base na resp
           });
         }
     });
-  }
+  // }
 }
 
 function dataUpdateDB(device){
@@ -143,6 +144,26 @@ function dataUpdateDB(device){
   });
 }
 
+function verifyInt(data,node){
+  var partNode = node.split(':')[5],
+      stringData = data.split('&')[1],
+      hashData;
+  hashData = data.split('&');   // h=xxx&switch=0
+  hashData = hashData[0].split('=');
+  partNode = partNode.toUpperCase();
+  var hashTocheck = partNode+'&'+stringData;
+  var ok = sha256(hashTocheck,{ asBytes: true });
+  var hashFinal = ok[0].toString(16)+ok[31].toString(16);
+  console.log('[CoAP] Verificação de hash:'.red.bgBlack+'['+hashData[1]+'] --- ['+ok[0].toString(16)+ok[31].toString(16)+']');
+  if (hashFinal == hashData[1]){
+    console.log("[CoAP] Mensagem Integra recebida!".red.bgBlack);
+    return true;
+  }
+  else
+    console.log("[CoAP] Problema de integridade na mensagem recebida".red.bgBlack);
+    return false;
+}
+
 function coapReqHandle( res ){
   // console.log(JSON.stringify(res, null, 4));
   var dev_address = res.rsinfo.address,
@@ -157,8 +178,10 @@ function coapReqHandle( res ){
   console.log('[CoAP] Mensagem recebida:'.red.bgBlack+' ['+dev_address+'] -> '+payload);
   console.log('[CoAP] DEVICE:'.white.bgBlack+' ['+devices[i].hw_address+']');
 
-  dataUpdateDB(devices[i]);
-  updateDash(devices[i]);
+  if (verifyInt(String(payload),dev_address)) {
+    dataUpdateDB(devices[i]);
+    updateDash(devices[i]);
+  }
 }
 
 function coapErrorHandle( error ) {
