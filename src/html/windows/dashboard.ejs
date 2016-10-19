@@ -8,13 +8,13 @@
     <div gridster="gridsterOpts">
         <ul>
             <li gridster-item="dash" ng-repeat="dash in dash_sensors">
-								<div ng-if="dash.type == 'light'">
+								<div ng-class="{false:'inative_node'}[dash.status]" ng-if="dash.type == 'light'">
 									<ng-include src="'pages/windows/dash_templates/light_sensor.ejs'"></ng-include>
 								</div>
-								<div ng-if="dash.type == 'water'">
+								<div ng-class="{false:'inative_node'}[dash.status]" ng-if="dash.type == 'water'">
 									<ng-include src="'pages/windows/dash_templates/water_sensor.ejs'"></ng-include>
 								</div>
-								<div ng-if="dash.type == 'switch'">
+								<div ng-class="{false:'inative_node'}[dash.status]" ng-if="dash.type == 'switch'">
 									<ng-include src="'pages/windows/dash_templates/switch_sensor.ejs'"></ng-include>
 								</div>
             </li>

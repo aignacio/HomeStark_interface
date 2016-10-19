@@ -43,9 +43,12 @@
   display: none;
   z-index: 1;
   position: absolute;
-  background-color: #ddd;
   border-color: #fff;
-  opacity: 0.2;
+  /*background-color: #ddd;*/
+  /*opacity: 0.2;*/
+  /* Nova definição por Ânderson I.*/
+  background-color: grey;
+  opacity: 0.1;
 }
 .gridster-loaded .gridster-item.gridster-item-moving,
 .gridster-loaded .gridster-preview-holder {

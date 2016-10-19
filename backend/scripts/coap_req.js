@@ -13,7 +13,6 @@
 
 /********************************* DISCLAIMER *********************************/
 
-
 var node = require('../models/nodes');
 var dash_dev = require('../models/dash');
 var constants = require('../var_constants');
@@ -227,6 +226,21 @@ function scan_coapDevices(){
           req.end();
         break;
         default:
+      }
+    }
+    else {
+      if (devices[global_devices_index].active == false) {
+        console.log('[CoAP]'.red.bgBlack+' Dispositivo offline ['+devices[global_devices_index].hw_address+']');
+        dash_dev.update({'hw_assoc':devices[global_devices_index].hw_address.toLowerCase()},
+        { 'active'      : false },
+        function(err,node_data){
+          if (err) {
+            console.log('[Erro] ao atualizar dash no banco de dados: '+err);
+          }
+          // else {
+          //  console.log('[MongoDB] Sucesso ao atualizar nó no banco de dados: [IPv6 Device]['+device.hw_address.toLowerCase()+']');
+          // }
+        });
       }
     }
   }

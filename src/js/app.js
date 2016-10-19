@@ -1,7 +1,8 @@
 var hero = angular.module('superhero', ['ui.bootstrap',
                                         'ngRoute',
                                         'homeStarkControllers',
-                                        'xeditable']);
+                                        'xeditable',
+                                        'ngAnimate']);
 hero.config(['$controllerProvider',
   function($controllerProvider) {
     $controllerProvider.allowGlobals();
@@ -20,6 +21,10 @@ hero.config(['$routeProvider',function($routeProvider) {
     }).
     when('/devices', {
       templateUrl: '/pages/windows/devices.ejs',
+      controller: ''
+    }).
+    when('/node_map', {
+      templateUrl: '/pages/windows/node_map.ejs',
       controller: ''
     }).
     when('/about', {

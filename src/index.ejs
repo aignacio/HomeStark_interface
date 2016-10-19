@@ -13,10 +13,11 @@
     <link rel="stylesheet" type="text/css" href="components/parsleyjs/src/parsley.css"/>
     <link rel="stylesheet" type="text/css" href="components/semantic/dist/semantic.min.css"/>
     <link rel="stylesheet" type="text/css" href="components/angular-video-background/src/video-background.css"/>
-    <link rel="stylesheet" type="text/css" href="components/angular-gridster/dist/angular-gridster.min.css"/>
+    <link rel="stylesheet" type="text/css" href="components/angular-gridster/dist/angular-gridster.css"/>
     <link rel="stylesheet" type="text/css" href="components/angular-ui-switch/angular-ui-switch.min.css"/>
     <link rel="stylesheet" type="text/css" href="components/angular-xeditable/dist/css/xeditable.css" rel="stylesheet" />
     <link rel="stylesheet" type="text/css" href="components/angular-theme-spinner/dist/angular-theme-spinner.min.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="components/vis/dist/vis.css" rel="stylesheet" />
     <!-- endbuild -->
 
     <!-- build:css lib/css/custom_css.min.css -->
@@ -43,7 +44,9 @@
     <script type="text/javascript" src="components/angular-ui-switch/angular-ui-switch.min.js"></script>
     <script type="text/javascript" src="components/angular-xeditable/dist/js/xeditable.js"></script>
     <script type="text/javascript" src="components/angular-theme-spinner/dist/angular-theme-spinner.min.js"></script>
-    <!-- <script type="text/javascript" src="components/angular-theme-spinner/dist/angular-theme-spinner.min.js.map"></script> -->
+    <script type="text/javascript" src="components/angular-animate/angular-animate.min.js"></script>
+    <script type="text/javascript" src="components/vis/dist/vis.js"></script>
+    <!-- <script type="text/javascript" src="components/angular-visjs/angular-vis.js"></script> -->
     <!-- endbuild -->
 
     <!-- Custom Scripts -->
@@ -65,9 +68,10 @@
           <a href="#/devices"><span class="menu-icon fa fa-bar-chart"></span>Dispositivos</a>
         </li>
         <li class="sidebar-list">
-          <% if(user.profile.admin) { %>
-          <a href="#/csv"><span class="menu-icon fa fa-cog"></span>Configurações</a>
-          <% } %>
+          <a href="#/node_map"><span class="menu-icon fa fa-code-fork"></span>Rede</a>
+        </li>
+        <li class="sidebar-list">
+          <a href="#/about"><span class="menu-icon fa fa-cog"></span>Sobre</a>
         </li>
       </ul>
       <!-- User Wrapper -->

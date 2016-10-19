@@ -206,7 +206,7 @@ body {
     -moz-box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
     color: black;
-    background: #ffffff;
+    /*background: #ffffff;*/
     padding: 10px;
     min-width: 278px;
     min-height: 262px;
@@ -217,3 +217,30 @@ body {
   display: table-cell;
   vertical-align: middle;
 }
+
+/* Transição do spinner na dashboard*/
+.ng-hide-add-active {
+  display: block!important;
+  -webkit-transition: 0.5s linear all;
+  transition: 0.5s linear all;
+}
+.ng-hide-remove-active {
+  display: block!important;
+  -webkit-transition: 0.5s linear all;
+  transition: 0.5s linear all;
+  -webkit-transition-delay: 0.5s;
+  transition-delay: 0.5s;
+}
+.ng-hide {
+  opacity: 0;
+}
+
+/* Transição do spinner na dashboard*/
+
+.inative_node{
+  opacity: 0.25;
+}
+/*.gridster-item.gridster-preview-holder.ng-scope {
+background-color: grey;
+opacity: 0.6;
+}*/

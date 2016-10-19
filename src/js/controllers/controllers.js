@@ -213,7 +213,7 @@ homeStarkController.controller('dashCtrl',['$scope','ShareDash','$uibModal','$ti
           data[i].value = false;
         else
           data[i].value = true;
-      $scope.dash_sensors[i].status = data[i].status;
+      $scope.dash_sensors[i].status = data[i].active;
       $scope.dash_sensors[i].value = data[i].value;
       $scope.dash_sensors[i].updated = data[i].updated;
     }
@@ -224,7 +224,7 @@ homeStarkController.controller('dashCtrl',['$scope','ShareDash','$uibModal','$ti
   };
 
   var refreshSensors = function() {
-    time = $timeout(refreshSensors, 10000);
+    time = $timeout(refreshSensors,5000);
     $scope.showUpdate = true;
     $http({method: 'GET', url: '/dash/list'}).
       then(function(response) {
@@ -322,3 +322,53 @@ homeStarkController.service('ShareDash', function () {
 
     return dash;
 });
+
+homeStarkController.controller('networkCtrl', ['$scope','$timeout','$http','$location', function ($scope,$timeout, $http,$location) {
+
+    // create an array with nodes
+    var nodes = [
+      {id: 1, label: 'Node 1', font: {strokeWidth: 3, strokeColor: 'white'}},
+      {id: 2, label: 'Node 2'},
+      {id: 3, label: 'Node 3'},
+      {id: 4, label: 'Node 4'},
+      {id: 5, label: 'Node 5'}
+    ];
+
+    // create an array with edges
+    var edges = [
+      {from: 1, to: 2, label: 'RSSI', font: {strokeWidth: 2, strokeColor : 'red'}},
+      {from: 1, to: 3, label: 'RSSI'},
+      {from: 2, to: 4},
+      {from: 2, to: 5}
+    ];
+
+    var options = {
+        nodes: {
+            color: 'black',
+            shape: 'dot',
+            size: 30,
+            font: {
+                size: 32
+            },
+            borderWidth: 0,
+            shadow:true
+        },
+        edges: {
+            width: 2,
+            shadow:true
+        }
+    };
+    // create a network
+    var container = document.getElementById('networkNodes');
+    var data = {
+      nodes: nodes,
+      edges: edges
+    };
+    // var options = {
+    //   nodes : {
+    //     shape: 'dot',
+    //     size: 10
+    //   }
+    // };
+    var network = new vis.Network(container, data, options);
+}]);
