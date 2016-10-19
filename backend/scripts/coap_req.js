@@ -184,7 +184,7 @@ function coapReqHandle( res ){
 }
 
 function coapErrorHandle( error ) {
-  console.error('[ERRO COAP]'+error );
+  // console.error('[ERRO COAP]'+error );
 }
 
 function scan_coapDevices(){

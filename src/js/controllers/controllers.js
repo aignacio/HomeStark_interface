@@ -193,6 +193,7 @@ homeStarkController.controller('dashCtrl',['$scope','ShareDash','$uibModal','$ti
           sensors[i].value = false;
         else
           sensors[i].value = true;
+
       sensor_dash.push({status:sensors[i].active,
                         sizeX: 1,
                         sizeY: 1,
@@ -201,6 +202,7 @@ homeStarkController.controller('dashCtrl',['$scope','ShareDash','$uibModal','$ti
                         name: sensors[i].name,
                         updated: sensors[i].updated,
                         hw: sensors[i].hw_assoc});
+
     }
     // console.log(sensor_dash);
     return sensor_dash;
@@ -213,6 +215,11 @@ homeStarkController.controller('dashCtrl',['$scope','ShareDash','$uibModal','$ti
           data[i].value = false;
         else
           data[i].value = true;
+      // if (data[i].active === false)
+      //   $scope.dash_sensors[i].status = 'Inativo';
+      // else
+      //   $scope.dash_sensors[i].status = 'Ativo';
+
       $scope.dash_sensors[i].status = data[i].active;
       $scope.dash_sensors[i].value = data[i].value;
       $scope.dash_sensors[i].updated = data[i].updated;
@@ -324,51 +331,85 @@ homeStarkController.service('ShareDash', function () {
 });
 
 homeStarkController.controller('networkCtrl', ['$scope','$timeout','$http','$location', function ($scope,$timeout, $http,$location) {
+  // create an array with nodes
+  var nodes = [{
+    id: '8582',
+    label: '8582'
+    // {id: 'b', label: 'Node 2'},
+    // {id: 'c', label: 'Node 3'},
+    // {id: 'd', label: 'Node 4'},
+    // {id: 'e', label: 'Node 5'}
+  }];
 
-    // create an array with nodes
-    var nodes = [
-      {id: 1, label: 'Node 1', font: {strokeWidth: 3, strokeColor: 'white'}},
-      {id: 2, label: 'Node 2'},
-      {id: 3, label: 'Node 3'},
-      {id: 4, label: 'Node 4'},
-      {id: 5, label: 'Node 5'}
-    ];
+  // create an array with edges
+  var edges = [
+    // {from: 'a', to: 'b', label: 'RSSI', font: {strokeWidth: 2, strokeColor : 'red'}},
+    // {from: 'b', to: 'c', label: 'RSSI'},
+    // {from: 'c', to: 'd'},
+    // {from: 'd', to: 'e'}
+  ];
 
-    // create an array with edges
-    var edges = [
-      {from: 1, to: 2, label: 'RSSI', font: {strokeWidth: 2, strokeColor : 'red'}},
-      {from: 1, to: 3, label: 'RSSI'},
-      {from: 2, to: 4},
-      {from: 2, to: 5}
-    ];
-
-    var options = {
-        nodes: {
-            color: 'black',
-            shape: 'dot',
-            size: 30,
-            font: {
-                size: 32
-            },
-            borderWidth: 0,
-            shadow:true
-        },
-        edges: {
-            width: 2,
-            shadow:true
+  var options = {
+      nodes: {
+          color: 'black',
+          shape: 'dot',
+          size: 30,
+          font: {
+              size: 32
+          },
+          borderWidth: 0,
+          shadow:true
+      },
+      edges: {
+          width: 2,
+          shadow:true
+      },
+      layout: {
+        hierarchical: {
+            direction: 'UD'
         }
-    };
-    // create a network
-    var container = document.getElementById('networkNodes');
-    var data = {
-      nodes: nodes,
-      edges: edges
-    };
-    // var options = {
-    //   nodes : {
-    //     shape: 'dot',
-    //     size: 10
-    //   }
-    // };
-    var network = new vis.Network(container, data, options);
+      }
+  };
+  // create a network
+  var container = document.getElementById('networkNodes');
+  var data = {
+    nodes: nodes,
+    edges: edges
+  };
+  // var options = {
+  //   nodes : {
+  //     shape: 'dot',
+  //     size: 10
+  //   }
+  // };
+  var network;
+
+  $http({method: 'GET', url: '/devices/list'}).
+    then(function(response) {
+      createNodes(response.data);
+      network = new vis.Network(container, data, options);
+
+    }, function(response) {
+      $scope.data = response.data || "Request failed";
+      $scope.status = response.status;
+      console.log($scope.status);
+  });
+
+  function createNodes(node_db){
+    for (var i = 0; i < node_db.length; i++) {
+      if (node_db[i].ipv6_local != '---' && node_db[i].rota_pref != '---') {
+        nodes.push({
+          id: node_db[i].ipv6_local.split(':')[5],
+          label: node_db[i].ipv6_local.split(':')[5]
+        });
+
+        edges.push({
+          from:node_db[i].ipv6_local.split(':')[5],
+          to:node_db[i].rota_pref.split(':')[5],
+          label: node_db[i].rssi_value,
+          font: {strokeWidth: 3}
+        });
+      }
+    }
+  }
 }]);
