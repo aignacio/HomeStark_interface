@@ -51,7 +51,7 @@ homeStarkController.controller('devicesCtrl',['$scope','$http','$timeout',functi
 
 homeStarkController.controller('dashCtrl',['$scope','ShareDash','$uibModal','$timeout','$http',function($scope,ShareDash,$uibModal,$timeout,$http){
   $scope.gridsterOpts = {
-      columns: 6, // the width of the grid, in columns
+      columns: 4, // the width of the grid, in columns
       pushing: true, // whether to push other items out of the way on move or resize
       floating: true, // whether to automatically float items up so they stack (you can temporarily disable if you are adding unsorted items with ng-repeat)
       swapping: true, // whether or not to have items of the same size switch places instead of pushing down if they are the same size
@@ -334,22 +334,14 @@ homeStarkController.controller('networkCtrl', ['$scope','$timeout','$http','$loc
   // create an array with nodes
   var nodes = [{
     id: '8582',
-    label: '8582'
-    // {id: 'b', label: 'Node 2'},
-    // {id: 'c', label: 'Node 3'},
-    // {id: 'd', label: 'Node 4'},
-    // {id: 'e', label: 'Node 5'}
+    label: '8582',
+    group:'border_router'
   }];
-
-  // create an array with edges
-  var edges = [
-    // {from: 'a', to: 'b', label: 'RSSI', font: {strokeWidth: 2, strokeColor : 'red'}},
-    // {from: 'b', to: 'c', label: 'RSSI'},
-    // {from: 'c', to: 'd'},
-    // {from: 'd', to: 'e'}
-  ];
-
+  var edges = [];
   var options = {
+      interaction:{
+        hover:true
+      },
       nodes: {
           color: 'black',
           shape: 'dot',
@@ -364,31 +356,60 @@ homeStarkController.controller('networkCtrl', ['$scope','$timeout','$http','$loc
           width: 2,
           shadow:true
       },
-      layout: {
-        hierarchical: {
-            direction: 'UD'
+      groups: {
+        device_switch: {
+          shape: 'icon',
+          icon: {
+            face: 'FontAwesome',
+            code: '\uf204',
+            size: 50,
+            color: 'black'
+          }
+        },
+        device_water: {
+          shape: 'icon',
+          icon: {
+            face: 'FontAwesome',
+            code: '\uf043',
+            size: 50,
+            color: 'black'
+          }
+        },
+        device_light: {
+          shape: 'icon',
+          icon: {
+            face: 'FontAwesome',
+            code: '\uf0eb',
+            size: 50,
+            color: 'black'
+          }
+        },
+        border_router:{
+          shape: 'icon',
+          icon:{
+            face:'FontAwesome',
+            code:'\uf17c',
+            size: 50,
+            color: 'black'
+          }
         }
       }
   };
-  // create a network
   var container = document.getElementById('networkNodes');
   var data = {
     nodes: nodes,
     edges: edges
   };
-  // var options = {
-  //   nodes : {
-  //     shape: 'dot',
-  //     size: 10
-  //   }
-  // };
   var network;
 
   $http({method: 'GET', url: '/devices/list'}).
     then(function(response) {
       createNodes(response.data);
       network = new vis.Network(container, data, options);
-
+      network.on("doubleClick", function (params) {
+        console.log(params);
+        $(this.document).popover();
+      });
     }, function(response) {
       $scope.data = response.data || "Request failed";
       $scope.status = response.status;
@@ -400,14 +421,15 @@ homeStarkController.controller('networkCtrl', ['$scope','$timeout','$http','$loc
       if (node_db[i].ipv6_local != '---' && node_db[i].rota_pref != '---') {
         nodes.push({
           id: node_db[i].ipv6_local.split(':')[5],
-          label: node_db[i].ipv6_local.split(':')[5]
+          label: node_db[i].ipv6_local.split(':')[5],
+          group:node_db[i].type_device
         });
 
         edges.push({
           from:node_db[i].ipv6_local.split(':')[5],
           to:node_db[i].rota_pref.split(':')[5],
           label: node_db[i].rssi_value,
-          font: {strokeWidth: 3}
+          font: {strokeWidth: 2}
         });
       }
     }

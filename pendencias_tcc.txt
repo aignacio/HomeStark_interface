@@ -3,3 +3,6 @@ Anotações:
 -Registro na IANA;
 -Prints de trap e gets
 -Implementação SNMP
+
+-Segurança em função hash
+-Fluxograma do contexto de conexão
