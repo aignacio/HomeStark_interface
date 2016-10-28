@@ -6,3 +6,21 @@ Anotações:
 
 -Segurança em função hash
 -Fluxograma do contexto de conexão
+
+-Testes modulares de software
+-Citar Simulador COOJA
+-Testes do SNMP com base wireshark
+  -Contexto do terminal com requisição
+-Testes de CoAP com cupper
+  -Visualização no wireshark
+  -Teste de hash com formação individual
+
+-Testes da interface
+  -Teste do snmp
+    -TRAP
+    -GET
+  -Teste CoAP
+    -Hash
+
+-Teste integração
+  -Foi deixado o sistema rodando
