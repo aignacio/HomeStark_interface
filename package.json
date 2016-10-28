@@ -1,6 +1,7 @@
 {
   "name": "homestark",
   "main": "server.js",
+  "version":"1.0.0",
   "dependencies": {
     "bcrypt-nodejs": "latest",
     "body-parser": "latest",

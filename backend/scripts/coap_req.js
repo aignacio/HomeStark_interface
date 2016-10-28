@@ -19,7 +19,7 @@ var constants = require('../var_constants');
 var sha256 = require('sha256');
 var coap = require('coap');
 var colors = require('colors');
-var req = coap.request('coap://[aaaa::1]/test/hello').end();
+// var req = coap.request('coap://[aaaa::1]/test/hello').end();
 var exports = module.exports = {};
 var devices = [];
 const util = require('util');
