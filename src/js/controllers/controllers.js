@@ -333,8 +333,8 @@ homeStarkController.service('ShareDash', function () {
 homeStarkController.controller('networkCtrl', ['$scope','$timeout','$http','$location', function ($scope,$timeout, $http,$location) {
   // create an array with nodes
   var nodes = [{
-    id: '8582',
-    label: '8582',
+    id: 'aa04',
+    label: 'aa04',
     group:'border_router'
   }];
   var edges = [];
