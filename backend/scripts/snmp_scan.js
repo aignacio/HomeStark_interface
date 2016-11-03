@@ -406,7 +406,7 @@ var init_snmp_can = function(){
   // Init the timer to verify if the devices are alive
   setTimeout(verifAliveDevices, constants.timeCheckList);
 }
-
-// mongoCon(0);
-// init_snmp_can();
+// Descomente as duas linhas abaixo para iniciar stand-alone este script
+//mongoCon(0);
+//init_snmp_can();
 exports.init_snmp_can = init_snmp_can;
